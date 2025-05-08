@@ -141,12 +141,6 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Secret Command
-document.addEventListener('keydown', (e) => {
-    if (e.shiftKey && e.altKey && e.code === 'KeyD') {
-        setNotifier('SECRET UNLOCKED', 'You’re a hacker now.', 'purple', 'white');
-    }
-});
 
 // Idle Detection
 let idleTimer;
@@ -175,13 +169,20 @@ setInterval(() => {
     }
 }, 1000);
 
-// Text Input Detection for "I'm bored"
-document.addEventListener('keydown', () => {
-    const inputText = document.activeElement.value;
-    if (inputText && typeof inputText === 'string' && inputText.toLowerCase().includes("i'm bored")) {
-        setNotifier('I KNEW IT', 'You’re officially bored enough to talk to a website.', 'teal', 'white');
+// Secret Word Detection
+let typedBuffer = '';
+document.addEventListener('keydown', (e) => {
+    if (e.key.length === 1) {
+        typedBuffer += e.key.toLowerCase();
+        if (typedBuffer.includes("i'm bored")) {
+            setNotifier('I KNEW IT', 'You’re officially bored enough to talk to a website.', 'teal', 'white');
+            typedBuffer = ''; // optional: reset after detection
+        }
+        // Optional: limit buffer size to prevent memory growth
+        if (typedBuffer.length > 100) typedBuffer = typedBuffer.slice(-50);
     }
 });
+
 
 // Achievement System
 function checkProgressBadges() {
@@ -200,3 +201,30 @@ function checkProgressBadges() {
 }
 
 setInterval(checkProgressBadges, 1000);
+
+// Secret Command - Trigger for glowing effect
+document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && e.altKey && e.code === 'KeyD') {
+        setNotifier('SECRET UNLOCKED', 'You’re a hacker now.', 'purple', 'white');
+        
+        // Apply glowing effect to the header, containers, and footer
+        applyGlowingEffect();
+    }
+});
+
+// Function to apply the glowing effect
+function applyGlowingEffect() {
+    // Apply the glowing effect to the header
+    const header = document.querySelector('header');
+    header.style.boxShadow = '0 0 15px 5px orange';
+    
+    // Apply the glowing effect to all containers
+    const containers = document.querySelectorAll('.container');
+    containers.forEach(container => {
+        container.style.boxShadow = '0 0 15px 5px orange';
+    });
+    
+    // Apply the glowing effect to the footer
+    const footer = document.querySelector('footer');
+    footer.style.boxShadow = '0 0 15px 5px orange';
+}
