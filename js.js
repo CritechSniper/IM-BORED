@@ -23,9 +23,7 @@ const messages = [
 ];
 let messageIndex = -1;
 
-
-////////////////////////////////////////////////////////
-// Notifier Style Reset Function
+// Utility Functions
 function resetNotifierAfterDelay() {
     setTimeout(() => {
         notifier.innerHTML = '';
@@ -33,36 +31,29 @@ function resetNotifierAfterDelay() {
     }, 5000);
 }
 
-// Default notifier style
-function setNotifier(message, subMessage) {
+function setNotifier(message, subMessage, bg = 'black', color = 'lime') {
     notifier.innerHTML = message;
-    notifier.style.backgroundColor = 'black';
-    notifier.style.color = 'lime';
     notifierp.innerHTML = subMessage;
-    notifierp.style.backgroundColor = 'black';
-    notifierp.style.color = 'lime';
+    notifier.style.backgroundColor = bg;
+    notifier.style.color = color;
+    notifierp.style.backgroundColor = bg;
+    notifierp.style.color = color;
     resetNotifierAfterDelay();
 }
 
-
-////////////////////////////////////////////////////////
 // Container Hover Logic
 containers.forEach(container => {
     const content = container.querySelector('.content');
-    let originalContent = content.innerHTML;
+    const originalContent = content.innerHTML;
     let hoverTimer;
 
     container.addEventListener('mouseenter', () => {
         hoverTimer = setTimeout(() => {
             messageIndex = (messageIndex + 1) % messages.length;
             content.innerHTML = messages[messageIndex];
-            console.log('Hovered container!');
-
             if (messageIndex === 32) {
                 setNotifier('WHY ARE YOU STILL HERE?', 'BRUH...');
-                console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
-                progress += 1;
-                console.log(progress);
+                progress++;
             }
         }, 10000);
     });
@@ -73,8 +64,6 @@ containers.forEach(container => {
     });
 });
 
-
-////////////////////////////////////////////////////////
 // Header Logic
 const header = document.querySelector('header');
 const headerh1 = document.getElementById('headerh1');
@@ -83,6 +72,7 @@ const headerh1Text = headerh1.innerHTML;
 const headerpText = headerp.innerHTML;
 let prevStyle = window.getComputedStyle(header).backgroundColor;
 let headerHoveredOnce = false;
+let hoverTimer;
 
 header.addEventListener('mouseenter', () => {
     if (headerHoveredOnce) return;
@@ -92,9 +82,7 @@ header.addEventListener('mouseenter', () => {
         headerHoveredOnce = true;
         headerh1.innerHTML = 'Why?';
         headerp.innerHTML = 'Why are you here?';
-        console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
-        progress += 1;
-        console.log(progress);
+        progress++;
     }, 10000);
 });
 
@@ -106,93 +94,96 @@ header.addEventListener('mouseleave', () => {
     clearTimeout(hoverTimer);
 });
 
-// Dblclick on header
 header.addEventListener('dblclick', () => {
     setNotifier("DOUBLE CLICK???", "Okay hacker calm down.");
-    console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
-    progress += 1;
-    console.log(progress);
+    progress++;
 });
 
+// Clicking on wrong container
+document.querySelectorAll('.containers').forEach(c => {
+    c.addEventListener('click', () => {
+        if (!c.dataset.clicked) {
+            c.dataset.clicked = true;
+            setNotifier('YOUR AIM IS TRASH', 'U tried to click on the containers, but u missed...ryt?');
+            progress++;
+        }
+    });
+});
 
-////////////////////////////////////////////////////////
-// Click on Wrong Container (".containers")
-const containerss = document.querySelectorAll('.containers');
-let containersClicked = false;
-
-function containersClick() {
-    if (containersClicked) return;
-    containersClicked = true;
-    setNotifier('YOUR AIM IS TRASH', 'U tried to click on the containers, but u missed...ryt?');
-    console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
-    progress += 1;
-    console.log(progress);
-}
-containerss.forEach(c => c.addEventListener('click', containersClick));
-
-
-////////////////////////////////////////////////////////
-// Global Keyboard Listener for Funny Surprise
+// Global Keypress Listener
 let keyboardTriggered = false;
 window.addEventListener('keydown', () => {
-    if (keyboardTriggered) return;
-    keyboardTriggered = true;
-
-    setNotifier('TYPING???', 'Lemme guess...password is 1234?');
-    console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
-    progress += 1;
-    console.log(progress);
+    if (!keyboardTriggered) {
+        keyboardTriggered = true;
+        setNotifier('TYPING???', 'Lemme guess...password is 1234?');
+        progress++;
+    }
 });
 
-////////////////////////////////////////////////////////
 // Footer Logic
 const footer = document.querySelector('footer');
-let footerClicked = false; // 🔥 Track click only once
+let footerClicked = false;
 
 function footerClick() {
-    if (footerClicked) return; // Prevent multiple executions
+    if (footerClicked) return;
     footerClicked = true;
-    notifier.innerHTML = 'YOU CLICKED THE FOOTER';
-    notifier.style.color = 'black';
-    notifier.style.backgroundColor = 'red';
-    notifierp.innerHTML = 'I mean, I guess you can click it.';
-    notifierp.style.color = 'black';
-    notifierp.style.backgroundColor = 'red';
-
-    console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
-    progress += 1;
-    console.log(progress);
-
-    console.log('Clicked on the footer!');
-
-    setTimeout(() => {
-        notifier.innerHTML = '';
-        notifierp.innerHTML = '';
-    }, 5000);
+    setNotifier('YOU CLICKED THE FOOTER', 'I mean, I guess you can click it.', 'red', 'black');
+    progress++;
 }
 
 window.addEventListener('scroll', () => {
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
         if (!footerClicked) {
-            footerClick(); // Trigger on first scroll to bottom
+            footerClick();
         } else {
-            notifier.innerHTML = 'Still scrolling, huh?';
-            notifierp.innerHTML = 'There’s literally nothing down there.';
-            notifier.style.backgroundColor = 'black';
-            notifier.style.color = 'white';
-            notifierp.style.backgroundColor = 'black';
-            notifierp.style.color = 'white';
-
-            setTimeout(() => {
-                notifier.innerHTML = '';
-                notifierp.innerHTML = '';
-            }, 5000);
+            setNotifier('Still scrolling, huh?', 'There’s literally nothing down there.', 'black', 'white');
         }
     }
 });
 
-////////////////////////////////////////////////////////
-// Progress Achievement System
+// Secret Command
+document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && e.altKey && e.code === 'KeyD') {
+        setNotifier('SECRET UNLOCKED', 'You’re a hacker now.', 'purple', 'white');
+    }
+});
+
+// Idle Detection
+let idleTimer;
+function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+        setNotifier('You alive?', 'You haven’t touched anything in a while...', 'gray', 'black');
+    }, 20000);
+}
+['mousemove', 'keydown', 'scroll'].forEach(evt =>
+    document.addEventListener(evt, resetIdleTimer)
+);
+resetIdleTimer();
+
+// DevTools Detection
+let devtoolsOpen = false;
+const threshold = 160;
+setInterval(() => {
+    if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+        if (!devtoolsOpen) {
+            devtoolsOpen = true;
+            setNotifier('HEY!', 'Stop inspecting me 😡', 'orange', 'black');
+        }
+    } else {
+        devtoolsOpen = false;
+    }
+}, 1000);
+
+// Text Input Detection for "I'm bored"
+document.addEventListener('keydown', () => {
+    const inputText = document.activeElement.value;
+    if (inputText && typeof inputText === 'string' && inputText.toLowerCase().includes("i'm bored")) {
+        setNotifier('I KNEW IT', 'You’re officially bored enough to talk to a website.', 'teal', 'white');
+    }
+});
+
+// Achievement System
 function checkProgressBadges() {
     const badges = [
         { milestone: 5, title: '🎉 You unlocked: "Professional Loiterer"', msg: 'Congratulations! I guess?' },
@@ -201,18 +192,11 @@ function checkProgressBadges() {
         { milestone: 20, title: '🚀 You unlocked: "Intergalactic Procrastinator"', msg: 'You could be an astronaut with this level of distraction.' },
         { milestone: 25, title: '👑 You unlocked: "King/Queen of Avoidance"', msg: 'You deserve a throne for this.' },
     ];
-
     badges.forEach(badge => {
         if (progress === badge.milestone) {
-            notifier.innerHTML = badge.title;
-            notifierp.innerHTML = badge.msg;
-            notifier.style.backgroundColor = '#0f0'; // Lime-green bg
-            notifier.style.color = 'black';
-            notifierp.style.backgroundColor = '#0f0';
-            notifierp.style.color = 'black';
-            resetNotifierAfterDelay();
+            setNotifier(badge.title, badge.msg, '#0f0', 'black');
         }
     });
 }
 
-setInterval(checkProgressBadges, 1000); // Constantly monitor progress
+setInterval(checkProgressBadges, 1000);
