@@ -184,6 +184,18 @@ document.addEventListener('keydown', (e) => {
 });
 
 
+// Achievement Popup
+function showAchievement(title, msg) {
+    const popup = document.getElementById('achievementPopup');
+    popup.innerHTML = `<div>${title}</div><div style="font-size: 0.9em; font-weight: normal;">${msg}</div>`;
+    popup.style.display = 'block';
+
+    // Auto-hide after 6 seconds
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 6000);
+}
+
 // Achievement System
 function checkProgressBadges() {
     const badges = [
@@ -193,14 +205,14 @@ function checkProgressBadges() {
         { milestone: 20, title: '🚀 You unlocked: "Intergalactic Procrastinator"', msg: 'You could be an astronaut with this level of distraction.' },
         { milestone: 25, title: '👑 You unlocked: "King/Queen of Avoidance"', msg: 'You deserve a throne for this.' },
     ];
+
     badges.forEach(badge => {
         if (progress === badge.milestone) {
-            setNotifier(badge.title, badge.msg, '#0f0', 'black');
+            showAchievement(badge.title, badge.msg);
         }
     });
 }
 
-setInterval(checkProgressBadges, 1000);
 
 // Secret Command - Trigger for glowing effect
 document.addEventListener('keydown', (e) => {
