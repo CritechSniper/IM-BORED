@@ -55,7 +55,7 @@ containers.forEach(container => {
                 setNotifier('WHY ARE YOU STILL HERE?', 'BRUH...');
                 progress++;
             }
-        }, 10000);
+        }, 100);
     });
 
     container.addEventListener('mouseleave', () => {
