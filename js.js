@@ -144,6 +144,52 @@ window.addEventListener('keydown', () => {
     console.log(progress);
 });
 
+////////////////////////////////////////////////////////
+// Footer Logic
+const footer = document.querySelector('footer');
+let footerClicked = false; // 🔥 Track click only once
+
+function footerClick() {
+    if (footerClicked) return; // Prevent multiple executions
+    footerClicked = true;
+    notifier.innerHTML = 'YOU CLICKED THE FOOTER';
+    notifier.style.color = 'black';
+    notifier.style.backgroundColor = 'red';
+    notifierp.innerHTML = 'I mean, I guess you can click it.';
+    notifierp.style.color = 'black';
+    notifierp.style.backgroundColor = 'red';
+
+    console.log('%cNotifier Marked!', 'color: red; font-size: 20px; font-weight: bold; text-decoration: underline;');
+    progress += 1;
+    console.log(progress);
+
+    console.log('Clicked on the footer!');
+
+    setTimeout(() => {
+        notifier.innerHTML = '';
+        notifierp.innerHTML = '';
+    }, 5000);
+}
+
+window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+        if (!footerClicked) {
+            footerClick(); // Trigger on first scroll to bottom
+        } else {
+            notifier.innerHTML = 'Still scrolling, huh?';
+            notifierp.innerHTML = 'There’s literally nothing down there.';
+            notifier.style.backgroundColor = 'black';
+            notifier.style.color = 'white';
+            notifierp.style.backgroundColor = 'black';
+            notifierp.style.color = 'white';
+
+            setTimeout(() => {
+                notifier.innerHTML = '';
+                notifierp.innerHTML = '';
+            }, 5000);
+        }
+    }
+});
 
 ////////////////////////////////////////////////////////
 // Progress Achievement System
