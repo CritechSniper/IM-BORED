@@ -42,10 +42,22 @@
             <p id="notifierp"></p>
         
         <div id="achievementPopup" style="display: none; position: fixed; bottom: 20px; right: 20px; background: gold; color: black; padding: 15px 20px; border-radius: 10px; box-shadow: 0 0 15px #000; font-weight: bold; z-index: 9999;"></div>
+        <button id="toggleRollContainer" onclick="document.querySelector('.hintbox').style.display = 'flex'">Roll For Hint</button>
+        <div class="hintbox">
+            <div class="hintbox-content">
+                <h2>Hint Box</h2>
+                <p>Sneaky, aren't cha?</p>
+                <button style="margin-bottom: 10px;"onclick="document.querySelector('.hintbox').style.display = 'none'">What does this long  bar do?</button>
+                <button id="rollHintBtn">🎲 Roll for Hint</button>
+                <div style="display: inline-flex;">
+                    <p style="padding-right: 10px;">Your hint is:</p><p id="hintDisplay"></p>
+                </div>
+            </div>
+        </div>
 
         </div>
     </body>
-    <footer onclick="footerClick()">
+    <footer>
         <p>find easter eggs...</p>
     </footer>
 </html>

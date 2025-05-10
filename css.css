@@ -12,6 +12,7 @@
 }
 html {
     height: 100%;
+    overflow-x: hidden;
     /* width: 100%; */
 }
 *{
@@ -97,4 +98,67 @@ footer {
 }
 footer p {
     margin: 0;
+}
+
+#toggleRollContainer {
+    opacity: 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin: 10px;
+    color: var(--text-clr);
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    font-size: large;
+    bottom: 0;
+    transition: all 0.3s ease;
+}
+#toggleRollContainer:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 1);
+    cursor: pointer;
+}
+.hintbox {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    z-index: 9999;
+
+    transition: all 0.3s ease;
+}
+.hintbox-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    background-color: var(--hover-clr);
+    width: 100%;
+    height: 100%;
+    max-width: 520px;
+    max-height: 250px;
+    padding: 30px;
+    border-radius: 10px;
+
+    transition: all 0.3s ease;
+}
+.hintbox-content button {
+    width: 100%;
+    min-height: 45px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+
+    transition: all 0.3s ease;
+
+}
+.hintbox-content button:hover {
+    background-color: rgba(0, 0, 0, 1);
+    cursor: pointer;
 }

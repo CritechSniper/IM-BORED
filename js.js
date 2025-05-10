@@ -1,8 +1,35 @@
+// ==== GLOBAL STATE ====
 let progress = 0;
+const unlockedBadges = [];
 
+// ==== DOM ELEMENTS ====
 const notifier = document.getElementById('notifier');
 const notifierp = document.getElementById('notifierp');
+const header = document.querySelector('header');
+const headerh1 = document.getElementById('headerh1');
+const headerp = document.getElementById('headerp');
 const containers = document.querySelectorAll('.container');
+const footer = document.querySelector('footer');
+const popup = document.getElementById('achievementPopup');
+const rollHintBtn = document.getElementById('rollHintBtn');
+const hintDisplay = document.getElementById('hintDisplay');
+
+// ==== NOTIFIER FUNCTIONS ====
+function setNotifier(message, subMessage, bg = 'black', color = 'lime') {
+    notifier.innerHTML = message;
+    notifierp.innerHTML = subMessage;
+    notifier.style.backgroundColor = bg;
+    notifier.style.color = color;
+    notifierp.style.backgroundColor = bg;
+    notifierp.style.color = color;
+    setTimeout(() => {
+        notifier.innerHTML = '';
+        notifierp.innerHTML = '';
+    }, 5000);
+}
+
+// ==== CONTAINER HOVER LOGIC ====
+let messageIndex = -1;
 const messages = [
     "Bruh...", "Why are you still here?", "You must be really bored...",
     "Seriously, find something better to do.", "This is getting ridiculous.",
@@ -21,27 +48,7 @@ const messages = [
     "You know what? IM DONE WITH THIS.", "...", "I literally said I was done.",
     "But here I am, looking at you hovering this damn box.",
 ];
-let messageIndex = -1;
 
-// Utility Functions
-function resetNotifierAfterDelay() {
-    setTimeout(() => {
-        notifier.innerHTML = '';
-        notifierp.innerHTML = '';
-    }, 5000);
-}
-
-function setNotifier(message, subMessage, bg = 'black', color = 'lime') {
-    notifier.innerHTML = message;
-    notifierp.innerHTML = subMessage;
-    notifier.style.backgroundColor = bg;
-    notifier.style.color = color;
-    notifierp.style.backgroundColor = bg;
-    notifierp.style.color = color;
-    resetNotifierAfterDelay();
-}
-
-// Container Hover Logic
 containers.forEach(container => {
     const content = container.querySelector('.content');
     const originalContent = content.innerHTML;
@@ -55,7 +62,7 @@ containers.forEach(container => {
                 setNotifier('WHY ARE YOU STILL HERE?', 'BRUH...');
                 progress++;
             }
-        }, 100);
+        }, 5000);
     });
 
     container.addEventListener('mouseleave', () => {
@@ -64,15 +71,13 @@ containers.forEach(container => {
     });
 });
 
-// Header Logic
-const header = document.querySelector('header');
-const headerh1 = document.getElementById('headerh1');
-const headerp = document.getElementById('headerp');
+// ==== HEADER LOGIC ====
+let headerHoveredOnce = false;
+let headerClicked = false;
+let hoverTimer;
 const headerh1Text = headerh1.innerHTML;
 const headerpText = headerp.innerHTML;
 let prevStyle = window.getComputedStyle(header).backgroundColor;
-let headerHoveredOnce = false;
-let hoverTimer;
 
 header.addEventListener('mouseenter', () => {
     if (headerHoveredOnce) return;
@@ -95,11 +100,32 @@ header.addEventListener('mouseleave', () => {
 });
 
 header.addEventListener('dblclick', () => {
-    setNotifier("DOUBLE CLICK???", "Okay hacker calm down.");
-    progress++;
+    if (!headerClicked) {
+        headerClicked = true;
+        setNotifier("DOUBLE CLICK???", "Okay hacker calm down.");
+        progress++;
+    }
 });
 
-// Clicking on wrong container
+// ==== FOOTER LOGIC ====
+let footerClicked = false;
+let footerClickCount = 0;
+
+footer.addEventListener('click', () => {
+    if (!footerClicked) {
+        footerClicked = true;
+        setNotifier('YOU CLICKED THE FOOTER', 'I mean, I guess you can click it.', 'red', 'black');
+        progress++;
+    }
+
+    footerClickCount++;
+    if (footerClickCount === 5) {
+        setNotifier("FOOTER OBSESSED", "You clicked it 5 times.");
+        progress++;
+    }
+});
+
+// ==== WRONG CONTAINER CLICK ====
 document.querySelectorAll('.containers').forEach(c => {
     c.addEventListener('click', () => {
         if (!c.dataset.clicked) {
@@ -110,7 +136,7 @@ document.querySelectorAll('.containers').forEach(c => {
     });
 });
 
-// Global Keypress Listener
+// ==== KEYBOARD / SECRET DETECTIONS ====
 let keyboardTriggered = false;
 window.addEventListener('keydown', () => {
     if (!keyboardTriggered) {
@@ -120,83 +146,80 @@ window.addEventListener('keydown', () => {
     }
 });
 
-// Footer Logic
-const footer = document.querySelector('footer');
-let footerClicked = false;
-
-function footerClick() {
-    if (footerClicked) return;
-    footerClicked = true;
-    setNotifier('YOU CLICKED THE FOOTER', 'I mean, I guess you can click it.', 'red', 'black');
-    progress++;
-}
-
-window.addEventListener('scroll', () => {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
-        if (!footerClicked) {
-            footerClick();
-        } else {
-            setNotifier('Still scrolling, huh?', 'There’s literally nothing down there.', 'black', 'white');
-        }
-    }
-});
-
-
-// Idle Detection
-let idleTimer;
-function resetIdleTimer() {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-        setNotifier('You alive?', 'You haven’t touched anything in a while...', 'gray', 'black');
-    }, 20000);
-}
-['mousemove', 'keydown', 'scroll'].forEach(evt =>
-    document.addEventListener(evt, resetIdleTimer)
-);
-resetIdleTimer();
-
-// DevTools Detection
-let devtoolsOpen = false;
-const threshold = 160;
-setInterval(() => {
-    if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-        if (!devtoolsOpen) {
-            devtoolsOpen = true;
-            setNotifier('HEY!', 'Stop inspecting me 😡', 'orange', 'black');
-        }
-    } else {
-        devtoolsOpen = false;
-    }
-}, 1000);
-
-// Secret Word Detection
-let typedBuffer = '';
+let typedBuffer = '', typed = '';
 document.addEventListener('keydown', (e) => {
     if (e.key.length === 1) {
         typedBuffer += e.key.toLowerCase();
         if (typedBuffer.includes("i'm bored")) {
             setNotifier('I KNEW IT', 'You’re officially bored enough to talk to a website.', 'teal', 'white');
-            typedBuffer = ''; // optional: reset after detection
+            typedBuffer = '';
         }
-        // Optional: limit buffer size to prevent memory growth
-        if (typedBuffer.length > 100) typedBuffer = typedBuffer.slice(-50);
+        if (typedBuffer.length > 60) typedBuffer = typedBuffer.slice(-50);
+    }
+
+    typed += e.key.toLowerCase();
+    if (typed.includes('hack')) {
+        setNotifier("You typed: hack", "Hacker mode engaged.");
+        progress++;
+        typed = '';
     }
 });
 
+// ==== IDLE DETECTION ====
+let idleTimer;
+let idleDetected = false;
 
-// Achievement Popup
+function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+        if (!idleDetected) {
+            setNotifier("AFK Achieved", "You went idle for 30 seconds.");
+            progress++;
+            idleDetected = true;
+        }
+    }, 30000);
+}
+['mousemove', 'keydown', 'scroll', 'click'].forEach(evt =>
+    document.addEventListener(evt, resetIdleTimer)
+);
+resetIdleTimer();
+
+// ==== SCROLL DETECTION ====
+window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+        setNotifier('Still scrolling, huh?', 'There’s literally nothing down there.', 'black', 'white');
+    }
+});
+
+// ==== DEVTOOLS DETECTION ====
+let devtoolsTriggered = false;
+function detectDevTools() {
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100 && !devtoolsTriggered) {
+        devtoolsTriggered = true;
+        setNotifier('HEY!', 'Stop inspecting me 😡', 'orange', 'black');
+        progress++;
+    }
+}
+setInterval(detectDevTools, 3000);
+
+window.addEventListener('keydown', (e) => {
+    const isDevShortcut = (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))
+    );
+    if (isDevShortcut) detectDevTools();
+});
+
+// ==== ACHIEVEMENT SYSTEM ====
 function showAchievement(title, msg) {
-    const popup = document.getElementById('achievementPopup');
     popup.innerHTML = `<div>${title}</div><div style="font-size: 0.9em; font-weight: normal;">${msg}</div>`;
     popup.style.display = 'block';
-
-    // Auto-hide after 6 seconds
-    setTimeout(() => {
-        popup.style.display = 'none';
-    }, 6000);
+    setTimeout(() => popup.style.display = 'none', 6000);
 }
 
-// Achievement System
 function checkProgressBadges() {
     const badges = [
         { milestone: 5, title: '🎉 You unlocked: "Professional Loiterer"', msg: 'Congratulations! I guess?' },
@@ -207,36 +230,79 @@ function checkProgressBadges() {
     ];
 
     badges.forEach(badge => {
-        if (progress === badge.milestone) {
+        if (progress === badge.milestone && !unlockedBadges.includes(badge.milestone)) {
+            unlockedBadges.push(badge.milestone);
             showAchievement(badge.title, badge.msg);
         }
     });
 }
+setInterval(checkProgressBadges, 1000);
 
-
-// Secret Command - Trigger for glowing effect
+// ==== SECRET GLOW EFFECT ====
 document.addEventListener('keydown', (e) => {
     if (e.shiftKey && e.altKey && e.code === 'KeyD') {
         setNotifier('SECRET UNLOCKED', 'You’re a hacker now.', 'purple', 'white');
-        
-        // Apply glowing effect to the header, containers, and footer
-        applyGlowingEffect();
+        header.style.boxShadow = '0 0 15px 5px orange';
+        containers.forEach(container => container.style.boxShadow = '0 0 15px 5px orange');
+        footer.style.boxShadow = '0 0 15px 5px orange';
     }
 });
 
-// Function to apply the glowing effect
-function applyGlowingEffect() {
-    // Apply the glowing effect to the header
-    const header = document.querySelector('header');
-    header.style.boxShadow = '0 0 15px 5px orange';
-    
-    // Apply the glowing effect to all containers
-    const containers = document.querySelectorAll('.container');
-    containers.forEach(container => {
-        container.style.boxShadow = '0 0 15px 5px orange';
-    });
-    
-    // Apply the glowing effect to the footer
-    const footer = document.querySelector('footer');
-    footer.style.boxShadow = '0 0 15px 5px orange';
-}
+// ==== ROLL HINT BUTTON ====
+
+// 20 fail messages, each repeated twice
+const failHints = [
+    "Better luck next click!",
+    "Hmm... try again?",
+    "That's not it.",
+    "So close! (Not really.)",
+    "Nope. Just no.",
+    "Wrong universe.",
+    "Nada. Zilch.",
+    "Try harder.",
+    "Oops. Try again.",
+    "Failure unlocked!",
+    "Meh.",
+    "Hint not found.",
+    "404: Clue missing.",
+    "You blinked and missed it.",
+    "Even I don't know what that was.",
+    "You're warming up... or not.",
+    "This is getting awkward.",
+    "That’s a swing and a miss!",
+    "No secrets here!",
+    "I’m just wasting your time."
+].flatMap(f => [f, f]); // repeat each twice
+
+// Good/real hints
+const goodHints = [
+    "Try double-clicking something weird...",
+    "Footer isn't just for decoration. 😏",
+    "Who hovers over a container 31 times?",
+    "Idle people get noticed 👀",
+    "Try pressing Shift + Alt + D",
+    "You reached the bottom, but why?",
+    "Inspect me and I’ll scream.",
+    "Header’s got secrets if you wait...",
+    "Something unlocks at 3:33 AM...",
+    "There’s something clickable you’ve ignored.",
+    "Check what’s behind the logo 👀",
+    "A long hover unlocks the truth.",
+    "Spam clicking might reveal something...",
+    "Move your mouse in a circle fast.",
+    "Have you tried resizing the window?"
+];
+
+// Final combined array (shuffle optional)
+const randomHints = [...failHints, ...goodHints];
+
+rollHintBtn.addEventListener('click', () => {
+    const hint = randomHints[Math.floor(Math.random() * randomHints.length)];
+    hintDisplay.textContent = hint;
+
+    const isGoodHint = goodHints.includes(hint) || hint.includes("👀");
+
+    // Style based on hint type
+    hintDisplay.style.color = isGoodHint ? 'lime' : 'gray';
+    hintDisplay.style.fontWeight = isGoodHint ? 'bold' : 'normal';
+});
